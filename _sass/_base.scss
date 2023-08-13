@@ -19,6 +19,19 @@ strong {
   color: var(--global-text-color);
 }
 
+#markdown-content h2 {
+  padding-bottom: 5px;
+}
+
+#markdown-content h4 {
+  color: #777;
+}
+
+.row.mt-3 {
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
 hr {
   border-top: 1px solid var(--global-divider-color);
 }
@@ -127,6 +140,8 @@ blockquote {
       margin: 0;
     }
   }
+
+  padding-left: 25px;
 }
 
 .profile.float-right {
@@ -424,6 +439,15 @@ footer.sticky-bottom {
 }
 
 .post-title {
+  mjx-container[jax="CHTML"][display="true"] {
+    display: unset;
+  }
+}
+
+.post-subtitle {
+  font-size: 2.0em;  /* This makes the font size 80% of its current size */
+  color: #777;      /* A light gray color for the subtitle */
+
   mjx-container[jax="CHTML"][display="true"] {
     display: unset;
   }
@@ -783,6 +807,8 @@ html.transition *:after {
   }
 
   .post-content {
+    padding-top: 20px;
+    
     blockquote {
       border-left: 5px solid var(--global-theme-color);
       padding: 8px;
