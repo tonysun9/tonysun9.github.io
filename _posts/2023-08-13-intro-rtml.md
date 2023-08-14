@@ -368,6 +368,13 @@ However, preparing features to be used for real-time prediction is only half the
 
 In the meantime, I’m always learning more about real-time machine learning. If this post resonated with you, I’d love to hear from you. I work at Claypot AI, where we’re building a real-time machine learning platform.
 
+---
+
+
+## Acknowledgments
+
+Thanks to Zhenzhong Xu and Chip Huyen for reviewing early drafts of this post.
+
 
 ---
 
