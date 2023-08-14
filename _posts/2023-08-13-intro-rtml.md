@@ -321,7 +321,7 @@ Staleness matters for two reasons:
 1. **Exclusion of recent data**. If recent information is important to how the feature is computed and ultimately model performance, it may be critical to have fresh data.
 2. **Train-prediction inconsistency.** If the model was trained with features computed at the time of event but uses stale features at the time of prediction, this can lead to worse model performance. Ensuring train-prediction consistency is a nuanced point and will be explored more in-depth in the next post.
 
-Another consideration is how much repetitive computation will be performed during each batch. For example, if my feature is computed on data from the past three months, re-running a batch job to compute that feature every night can be wasteful. In such a scenario, a stateful, long-running streaming job can actually lower costs.
+Another consideration is how much repetitive computation will be performed during each batch. For example, if my feature is computed on data from the past three months, re-running a batch job to compute that feature every night can be wasteful [22]. In such a scenario, a stateful, long-running streaming job can actually lower costs.
 
 
 <div class="row mt-3">
@@ -336,7 +336,7 @@ Another consideration is how much repetitive computation will be performed durin
 
 Derived features are **features that build upon other features**. For example, say that in my data exploration process, I find the feature “Z-score of transaction amount” to be predictive of fraud. After all, a transaction amount 3 standard deviations above the mean would be quite alarming.
 
-How the derived feature is computed naturally depends on the how the underlying features are computed. In our example, computing the mean and standard deviation of the average transaction amount in the past three months can be considered to be stateful and slow-changing features. We could compute these two features with either a batch or streaming engine. Once in the feature store, we can use an event’s transaction amount and combine it with the mean and standard deviation in a lambda function to compute the Z-score.
+How the derived feature is computed naturally depends on how the underlying features are computed. In our example, computing the mean and standard deviation of the average transaction amount in the past three months can be considered to be stateful and slow-changing features. We could compute these two features with either a batch or streaming engine. Once in the feature store, we can use an event’s transaction amount and combine it with the mean and standard deviation in a lambda function to compute the Z-score.
 
 
 #### Summary
@@ -440,3 +440,5 @@ GROUP BY **credit_card_num**;
 [20] [Over Aggregation](https://nightlies.apache.org/flink/flink-docs-release-1.14/docs/dev/table/sql/queries/over-agg/)
 
 [21] [Streaming 101: The world beyond batch](https://www.oreilly.com/radar/the-world-beyond-batch-streaming-101/)
+
+[22] The idea for the diagram is stolen shamelessly from Chip’s [continual training](https://huyenchip.com/2022/01/02/real-time-machine-learning-challenges-and-solutions.html) graphic.
