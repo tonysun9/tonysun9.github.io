@@ -30,17 +30,22 @@ This post resides at the intersection of these two fields: real-time data infras
 
 The critical component of _real-time machine learning_ is the use of machine learning models to **make predictions in real-time**. Specifically, a prediction is made through a _synchronous request_ and a response is expected to return immediately – on the order of hundreds of milliseconds, oftentimes less.
 
-Contrast this to making predictions in batch, in which predictions are made on a large volume of data points all at once [11, *]. Predictions are made via an _asynchronous batch job_. I have heard the term _batch machine learning_ to describe this concept, although it doesn’t appear to be highly prevalent [12]. 
+Contrast this to making predictions in batch, in which predictions are made on a large volume of data points all at once \[11, \*]. Predictions are made via a _batch job_. I have heard the term _batch machine learning_ to describe this concept, although it doesn’t appear to be highly prevalent \[12]. 
 
 Let’s work with a fraud detection example. In this example, a consumer purchases a laptop online. The credit card network, say Visa, tries to detect whether the transaction is fraudulent or not.
 
 Using the real-time machine learning paradigm, a prediction is made in _real-time_. That might look like the following:
 
+1. A transaction at a POS system triggers a _request_ to a _prediction service_ that predicts whether the transaction is fraudulent or not.
 
+2. In order to make a prediction, the prediction service first needs to retrieve all the relevant features for the model.
 
-1. The transaction is an _event_ relayed by a _message broker_ that in turn triggers a _request_ to a _prediction service_ that predicts whether the transaction is fraudulent or not.
-2. The prediction service is responsible for fetching the relevant features from the _feature store_ and passing those features along to the _model endpoint_ to make a prediction. 
-3. If the transaction is believed to be fraudulent, the transaction is flagged as such and prevented from going through.
+   a. Some features will be computed in real-time using information from the event itself.
+
+   b. Other features will be queried from the _feature store_.
+
+3. The retrieved features are passed to the model endpoint for prediction. If the transaction is believed to be fraudulent, the transaction is flagged as such and prevented from going through.
+
 
 
 <div class="row mt-3">
@@ -104,16 +109,14 @@ Here’s a brief and by no means comprehensive list of some applications that be
 * Personalized recommendations for marketing, e-commerce, and media and entertainment.
 * Real-time decision making for autonomous driving, high-frequency trading, and robotics.
 
-And if you’re reading this post, I’m sure you have a use case in mind that can benefit from real-time machine learning as well.
-
 
 ## How do we prepare features to be readily available for querying in a real-time machine learning pipeline?
 
-Earlier, we characterized a real-time prediction service as a system responsible for **querying for the relevant features from a feature store** and passing those features along to a model endpoint to perform prediction.
+Earlier, we characterized a real-time prediction service as being responsible for **computing real-time features and querying for features from an online feature store** and passing those features along to a model endpoint to perform prediction.
 
-The purpose of the feature store is to **reduce the latency of a prediction request**. By pre-computing feature values in advance, we save time that would otherwise be spent calculating these values during the prediction request. This not only makes our prediction service more efficient but also enables us to handle higher volumes of requests in a scalable way [*].
+The purpose of the online feature store is to **reduce the latency of a prediction request**. By computing feature values in advance, we save time that would otherwise be spent calculating these values during the prediction request. This not only makes our prediction service more efficient but also enables us to handle higher volumes of requests in a scalable way \[\*].
 
-We now turn our focus to the feature preparation component – namely, to **populate the feature store** with pre-computed features such that they can be readily queried when it comes time for real-time prediction.
+We now turn our focus to the feature preparation component with an emphasis on **populating the feature store** with pre-computed features such that they can be readily queried when it comes time for real-time prediction.
 
 
 <div class="row mt-3">
@@ -130,7 +133,7 @@ The engineering challenges around preparing features for real-time prediction de
 
 Feature stores can vary in complexity, ranging from a simple repository of pre-computed features to a much more intricate system responsible for feature versioning, data quality monitoring, access control, and more.
 
-For our purposes, we will use a simple **key-value store** as our feature store [16]. In our feature store, each key-value pair corresponds to a **computed feature value**. 
+For our purposes, we will use a **key-value store** as our online feature store [16]. In our feature store, each key-value pair corresponds to a **computed feature value**. 
 
 Here’s what a key-value pair might look like: the key is a concatenation of the feature name and its corresponding entity value(s). The value represents a computed feature value. 
 
@@ -233,7 +236,7 @@ Computing stateless and fast-changing features requires us to **process each eve
 
 This can be done through an _event-driven compute service_ such as AWS Lambda.
 
-Stateless and fast-changing features are also known as _real-time_ _feature_s because they are computed on-the-fly, in real-time.
+Stateless and fast-changing features are also known as _real-time features_ because they are computed on-the-fly, in real-time.
 
 
 <div class="row mt-3">
@@ -249,7 +252,9 @@ Something unique about stateless and fast-changing features is that they are not
 
 Because stateless and slow-changing features are slow-changing by definition, it makes sense to pre-compute these features and load them in the feature store well ahead of prediction time. This can be done through a **batch engine** such as Apache Spark.
 
-This typically involves querying for some data in an external warehouse or something similar. This may involve some data cleaning and transformation, although that may not be necessary, especially for stateless features. For our “age” feature, we would just need to query for the age of each customer_id and store those results in the feature store.
+In our example, the same transaction that triggers a prediction request is also written to a database. Data in that database, along with data from other data sources, may be periodically extracted and loaded into a data warehouse.
+
+Computing batch features involves retrieving a subset of data in that data warehouse and doing any necessary data cleaning and transformation. The batch job(s) can be kicked off periodically by an orchestrator, and the computed feature values are written to our online feature store. The dotted brown arrow in the figure below indicates that the data is processed periodically.
 
 
 <div class="row mt-3">
@@ -286,7 +291,7 @@ Windowing is a critical component of stream processing. For our feature “# of 
 
 If stateful and fast-changing features are computed with a tumbling or sliding window, they can also be considered _near real-time features_, because they are computed shortly before prediction time. However, if the feature is computed at prediction time, as when using over aggregation, this feature would be considered a _real-time_ feature.
 
-
+In our example, our transaction that’s written to a database is converted to an event in a message broker via a process known as change data capture (CDC). That event, along with events from other data sources, are processed by a set of stream processing jobs. The computed feature values are written to our online feature store. The green arrow in the figure below indicates that the data is processed continuously.
 
 <div class="row mt-3">
     <div class="col-sm mt-3 mt-md-0">
@@ -417,7 +422,7 @@ From a statistical perspective, inference and prediction actually mean slightly 
 
 [16] [Building a Scalable ML Feature Store with Redis](https://doordash.engineering/2020/11/19/building-a-gigascale-ml-feature-store-with-redis/) 
 
-[17] For stateful features, the entity corresponds to the field used by the GROUP BY clause if we were to compute the feature at a given point in time:
+[17] For stateful features, the entity (credit_card_num) corresponds to the field used by the GROUP BY clause if we were to compute the feature at a given point in time:
 
 ```sql
 
@@ -429,8 +434,7 @@ FROM transactions
 
 WHERE transaction_date >= DATE_SUB(CURDATE(), INTERVAL 3 MONTH)
 
-GROUP BY **credit_card_num**;
-
+GROUP BY credit_card_num;
 ```
 
 [18] A session is another type of window, but the beginning and end depend on user behavior.
