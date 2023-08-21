@@ -42,7 +42,7 @@ Using the real-time machine learning paradigm, a prediction is made in _real-tim
 
    a. Some features will be computed in real-time using information from the event itself.
 
-   b. Other features will be queried from the _feature store_.
+   b. Other features will be queried from the _online feature store_.
 
 3. The retrieved features are passed to the model endpoint for prediction. If the transaction is believed to be fraudulent, the transaction is flagged as such and prevented from going through.
 
@@ -88,7 +88,7 @@ Event Broker: kind of like a post office for software, accepting messages (event
 
 Feature store: a database that serves as a central repository for storing, managing, and serving machine learning features [*]. 
 
-Prediction Service: the infrastructure and related services set up to use a machine learning model for making predictions [*]. In our example, this includes querying the feature store and passing those features to a model endpoint.
+Prediction Service: the infrastructure and related services set up to use a machine learning model for making predictions [*]. In our example, this includes querying the online feature store and passing those features to a model endpoint.
 
 Model Endpoint: the network interface exposed by a deployed machine learning model, typically via a RESTful API, to receive and respond to prediction requests [*].
 
@@ -114,9 +114,9 @@ Here’s a brief and by no means comprehensive list of some applications that be
 
 Earlier, we characterized a real-time prediction service as being responsible for **computing real-time features and querying for features from an online feature store** and passing those features along to a model endpoint to perform prediction.
 
-The purpose of the online feature store is to **reduce the latency of a prediction request**. By computing feature values in advance, we save time that would otherwise be spent calculating these values during the prediction request. This not only makes our prediction service more efficient but also enables us to handle higher volumes of requests in a scalable way \[\*].
+The purpose of an online feature store is to **reduce the latency of a prediction request**. By computing feature values in advance, we save time that would otherwise be spent calculating these values during the prediction request. This not only makes our prediction service more efficient but also enables us to handle higher volumes of requests in a scalable way \[\*].
 
-We now turn our focus to the feature preparation component with an emphasis on **populating the feature store** with pre-computed features such that they can be readily queried when it comes time for real-time prediction.
+We now turn our focus to **populating the feature store** with pre-computed features such that they can be readily queried when it comes time for real-time prediction.
 
 
 <div class="row mt-3">
