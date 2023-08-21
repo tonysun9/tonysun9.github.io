@@ -354,7 +354,7 @@ How the derived feature is computed naturally depends on how the underlying feat
 </div>
 
 
-Put it all together, and this is a more complete depiction of real-time machine learning pipeline:
+Put it all together, and this is a more complete depiction of real-time machine learning system with data pipelines that prepare features for prediction:
 
 
 <div class="row mt-3">
