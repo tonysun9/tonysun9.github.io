@@ -23,7 +23,7 @@ This post resides at the intersection of these two fields: real-time data infras
 
 1. **What** is real-time machine learning?
 2. **Why** is real-time machine learning important?
-3. **How** do we compute features in a real-time prediction service?
+3. **How** do we compute features for real-time prediction?
 
 
 ## What is real-time machine learning?
